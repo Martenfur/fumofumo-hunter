@@ -40,7 +40,7 @@ function compare(dateString, items)
 		}
 	}
 	var report = {
-		dayChanged: (state.dateString != dateString),
+		dayChanged: (state.date != dateString),
 		firstRun: false,
 		newItems: []
 	}
