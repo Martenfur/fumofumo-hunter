@@ -23,7 +23,7 @@ client.on(
 	async () => {
 		console.log(`Fumo in. | ${client.user.tag}`)
 
-		client.user.setActivity('with fumos', { type: 'PLAYING' })
+		client.user.setActivity('fumos', { type: 'WATCHING' })
 
 		console.log("Running on servers:")
 		var guilds = client.guilds.cache.map(g => g)
@@ -41,7 +41,7 @@ client.on(
 			itemBatches[i] = await amiami.search(config.searches[i])
 		}
 
-		var threadMessage = await channel.send(`## ᗜ‿ᗜ`)
+		var threadMessage = await channel.send(`## time to get funky ᗜ‿ᗜ`)
 		var thread = await createThread(threadMessage)
 
 		var items = processItems(itemBatches)
@@ -75,6 +75,8 @@ async function createThread(message)
 }
 
 
+// Merges all searches into a single list, 
+// filters out closed orders and non-whitelisted makers.
 function processItems(itemBatches)
 {
 	var items = []
@@ -84,7 +86,7 @@ function processItems(itemBatches)
 		for(var k = 0 ; k < itemBatches[i].length; k += 1)
 		{
 			var availability = getAvailability(itemBatches[i][k])
-			if (availability.includes("Closed"))
+			if (availability.includes("Closed") || !isWhitelistedMaker(itemBatches[i][k]))
 			{
 				continue
 			}
@@ -94,6 +96,28 @@ function processItems(itemBatches)
 	}
 
 	return items
+}
+
+// Filters out any makers we're not interested in.
+function isWhitelistedMaker(item)
+{
+	// Empty or missing whitelist allows everything through.
+	if (config.makers_whitelist == undefined || config.makers_whitelist == null)
+	{
+		return true
+	}
+	if (config.makers_whitelist.length == 0)
+	{
+		return true
+	}
+	for(var i = 0; i < config.makers_whitelist.length; i += 1)
+	{
+		if (item.maker_name.toLowerCase() == config.makers_whitelist[i].toLowerCase())
+		{
+			return true
+		}
+	}
+	return false
 }
 
 async function printStatus(channel, items)
@@ -106,8 +130,8 @@ async function printStatus(channel, items)
 			continue
 		}
 		const attachment = new Discord.AttachmentBuilder(`https://img.amiami.com${items[i].thumb_url}`, 'image.jpg');
-		var msg = `## ${items[i].gname}`
-		+ `\n## [${getAvailability(items[i])}](https://www.amiami.com/eng/detail/?gcode=${items[i].gcode})`
+		var msg = `**${items[i].gname}**`
+		+ `\n[${getAvailability(items[i])}](https://www.amiami.com/eng/detail/?gcode=${items[i].gcode})`
 		+ ` (**${items[i].c_price_taxed}JPY**)`
 		await channel.send({ content: msg, files: [attachment] })
 	}

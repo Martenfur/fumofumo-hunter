@@ -1,7 +1,13 @@
 {
 	"searches": 
 	[
-		"fumofumo plush"
+		"touhou fumofumo plush",
+		"touhou mini plush"
+	],
+	"makers_whitelist": 
+	[
+		"Gift",
+		"Amiami"
 	],
 	"channel_id": "<your-discord-channel-id>",
 	"discord_token": "<your-token>"
