@@ -1,6 +1,8 @@
-const env = require('dotenv')
+const c = require('./config')
 const Discord = require('discord.js')
-const { MessageAttachment } = require('discord.js')
+const amiami = require("./amiami")
+
+const config = c.getConfig()
 
 const client = new Discord.Client(
 	{ 
@@ -16,10 +18,6 @@ const client = new Discord.Client(
 	}
 )
 
-const amiami = require("./amiami")
-
-env.config() // Dotenv stuff.
-
 client.on(
 	"ready", 
 	async () => {
@@ -34,28 +32,36 @@ client.on(
 			console.log(guilds[i].name + ": " + guilds[i].id)
 		}
 
-		var channel = client.channels.cache.get(process.env.AUTOPOST_CHANNEL_ID)
+		var channel = client.channels.cache.get(config.channel_id)
 		await channel.send("ᗜ‿ᗜ")
-		var items = await amiami.search("fumofumo plush")
-		console.log(items)
 
-		for(var i = items.length - 1; i >= 0; i -= 1)
+		for (var i = 0; i < config.searches.length; i += 1)
 		{
-			var availability = getAvailability(items[i])
-			if (availability.includes("Closed"))
-			{
-				continue
-			}
-			const attachment = new Discord.AttachmentBuilder(`https://img.amiami.com${items[i].thumb_url}`, 'image.jpg');
-			var msg = `## ${items[i].gname}`
-			+ `\n## [${getAvailability(items[i])}](https://www.amiami.com/eng/detail/?gcode=${items[i].gcode})`
-			+ ` (**${items[i].c_price_taxed}JPY**)`
-			await channel.send({ content: msg, files: [attachment] })
+			var items = await amiami.search(config.searches[i])
+			console.log(items)
+			await printStatus(channel, items)
 		}
 	}
 )
 
-client.login(process.env.DISCORD_TOKEN)
+client.login(config.discord_token)
+
+async function printStatus(channel, items)
+{
+	for(var i = items.length - 1; i >= 0; i -= 1)
+	{
+		var availability = getAvailability(items[i])
+		if (availability.includes("Closed"))
+		{
+			continue
+		}
+		const attachment = new Discord.AttachmentBuilder(`https://img.amiami.com${items[i].thumb_url}`, 'image.jpg');
+		var msg = `## ${items[i].gname}`
+		+ `\n## [${getAvailability(items[i])}](https://www.amiami.com/eng/detail/?gcode=${items[i].gcode})`
+		+ ` (**${items[i].c_price_taxed}JPY**)`
+		await channel.send({ content: msg, files: [attachment] })
+	}
+}
 
 function getAvailability(item)
 {
