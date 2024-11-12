@@ -77,7 +77,7 @@ Running as a service enables the bot to run in the background and start automati
 
 1. Create a new service file:
    `sudo nano /etc/systemd/system/fumo.service`
-2. Paste this into it:
+2. Paste this into it (check your clone path and change user name from `pi` if necessary):
 
 ```ini
 [Unit]
@@ -85,8 +85,9 @@ Description = fumo
 After = network.target
 
 [Service]
-WorkingDirectory=/home/pi/fumo
+WorkingDirectory = /home/pi/fumo
 ExecStart = forever src/fumo.js
+User = pi
 
 [Install]
 WantedBy = multi-user.target
