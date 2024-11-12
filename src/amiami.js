@@ -20,7 +20,7 @@ async function search(search)
 	);
 
 	const jsonData = await page.evaluate(() => {
-		const container = document.querySelector('body > pre');
+		const container = document.querySelector('body > pre')
 		
 		if (container) {
 			try {

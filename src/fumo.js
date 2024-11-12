@@ -131,7 +131,7 @@ async function printStatus(channel, items)
 		}
 		const attachment = new Discord.AttachmentBuilder(`https://img.amiami.com${items[i].thumb_url}`, 'image.jpg');
 		var msg = `**${items[i].gname}**`
-		+ `\n[${getAvailability(items[i])}](https://www.amiami.com/eng/detail/?gcode=${items[i].gcode})`
+		+ `\n### [${getAvailability(items[i])}](https://www.amiami.com/eng/detail/?gcode=${items[i].gcode})`
 		+ ` (**${items[i].c_price_taxed}JPY**)`
 		await channel.send({ content: msg, files: [attachment] })
 	}
@@ -178,5 +178,5 @@ function getAvailability(item)
 	{
 			return "On Sale"
 	}
-	return "Available"
+	return "Buy Now"
 }
