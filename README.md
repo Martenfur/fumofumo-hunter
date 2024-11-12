@@ -48,6 +48,10 @@ On first run, use:
 ```
 sudo npm install -g npm
 ```
+On Raspberry Pi, install hromium:
+```
+sudo apt install chromium-browser chromium-codecs-ffmpeg
+```
 
 After that, you should install `forever` npm module that enables autorestarting in case of crashes.
 

@@ -6,13 +6,19 @@ async function search(search)
 {
 	try
 	{
-		search = search.replace(" ", "%20")
-		const browser = await puppeteer.launch(
-			{ 
-				headless: true, 
-				executablePath: '/usr/bin/chromium-browser', // Remove if running on Windows.
+		var browserConfig = { 
+			headless: true, 
+			executablePath: '/usr/bin/chromium-browser'
+		}
+		if (process.platform === "win32")
+		{
+			// Linux requires manually pointing to Chromium to work.
+			browserConfig = { 
+				headless: true
 			}
-		);
+		}
+		search = search.replace(" ", "%20")
+		const browser = await puppeteer.launch(browserConfig);
 		const page = await browser.newPage();
 
 		await page.setUserAgent("python-amiami_dev");
