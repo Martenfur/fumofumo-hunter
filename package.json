@@ -1,0 +1,22 @@
+{
+  "name": "fumo",
+  "version": "0.0.1-a",
+  "description": "fumo",
+  "main": "src/fumo.js",
+  "author": "ferretcoat",
+  "license": "MIT",
+  "dependencies": {
+    "cheerio": "^1.0.0-rc.3",
+    "cleverbot-free": "^1.1.11",
+    "discord.js": "^14.5.0",
+    "dotenv": "^8.6.0",
+    "graphql": "^15.3.0",
+    "graphql-request": "^3.0.0",
+    "nodemon": "^2.0.2",
+    "puppeteer": "^23.7.1"
+  },
+  "scripts": {
+    "start": "node src/fumo.js",
+    "dev": "nodemon src/fumo.js"
+  }
+}
