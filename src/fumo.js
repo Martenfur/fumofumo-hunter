@@ -1,6 +1,7 @@
 const c = require('./config')
 const Discord = require('discord.js')
 const amiami = require("./amiami")
+const state = require("./state")
 
 const config = c.getConfig()
 
@@ -41,18 +42,50 @@ client.on(
 			itemBatches[i] = await amiami.search(config.searches[i])
 		}
 
-		var threadMessage = await channel.send(`## time to get funky ᗜ‿ᗜ`)
-		var thread = await createThread(threadMessage)
-
 		var items = processItems(itemBatches)
 		console.log(items)
-		await printStatus(thread, items)
+
+		var stateReport = state.compare(getDate(), items)
+		var threadMessage = await channel.send(getReportMessage(items, stateReport))
+		var thread = await createThread(threadMessage)
+
+		await printStatus(thread, items, stateReport)
+		state.save(getDate(), items)
 	}
 )
 
+function getReportMessage(items, stateReport)
+{
+	const noNewFumosMessage = `No new fumos today but **${items.length}** fumos are still available. ᗜˬᗜ`
+	const noFumosMessage = `You cannot buy any fumos at all today. ᗜ˰ᗜ`
+
+	if (items.length == 0)
+	{
+		return noFumosMessage
+	}
+	if (stateReport.firstRun || stateReport.newItems.length == 0)
+	{
+		return noNewFumosMessage
+	}
+	var newFumosMessage = `# BREAKING FUMO NEWS: ${stateReport.newItems.length} new fumos are available. ᗜ‿ᗜ`
+	if (stateReport.newItems.length == 1)
+	{
+		newFumosMessage = `# BREAKING FUMO NEWS: 1 new fumo is available. ᗜ‿ᗜ`
+	}
+
+	newFumosMessage += "\n```"
+	for(var i = 0; i < stateReport.newItems.length; i += 1)
+	{
+		newFumosMessage += `\n${stateReport.newItems[i].gname}`
+	}
+	newFumosMessage += "\n```"
+
+	return newFumosMessage
+}
+
 client.login(config.discord_token)
 
-async function createThread(message)
+function getDate()
 {
 	const date = new Date()
 	
@@ -60,11 +93,16 @@ async function createThread(message)
 	const month = String(date.getMonth() + 1).padStart(2, '0')
 	const year = date.getFullYear()
 	
-	var d =  `${day}-${month}-${year}`
+	return `${day}-${month}-${year}`
+}
+
+async function createThread(message)
+{
+	const date = getDate()
 
 	var thread = await message.startThread(
 		{
-			name: 'FUMO NEWS ' + d,
+			name: 'FUMO NEWS ' + date,
 			autoArchiveDuration: 60,
 			type: 'GUILD_PUBLIC_THREAD',
 			reason: 'fumo'
@@ -120,19 +158,20 @@ function isWhitelistedMaker(item)
 	return false
 }
 
-async function printStatus(channel, items)
+async function printStatus(channel, items, stateReport)
 {
 	for(var i = items.length - 1; i >= 0; i -= 1)
 	{
-		var availability = getAvailability(items[i])
-		if (availability.includes("Closed"))
-		{
-			continue
-		}
+		var isNew = stateReport.newItems.indexOf(items[i]) >= 0
+
 		const attachment = new Discord.AttachmentBuilder(`https://img.amiami.com${items[i].thumb_url}`, 'image.jpg');
 		var msg = `**${items[i].gname}**`
 		+ `\n### [${getAvailability(items[i])}](https://www.amiami.com/eng/detail/?gcode=${items[i].gcode})`
 		+ ` (**${items[i].c_price_taxed}JPY**)`
+		if (isNew)
+		{
+			msg = "# NEW: " + msg
+		}
 		await channel.send({ content: msg, files: [attachment] })
 	}
 }
