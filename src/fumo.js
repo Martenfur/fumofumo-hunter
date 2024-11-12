@@ -44,11 +44,9 @@ client.on(
 		var threadMessage = await channel.send(`## ᗜ‿ᗜ`)
 		var thread = await createThread(threadMessage)
 
-		for (var i = 0; i < itemBatches.length; i += 1)
-		{
-			console.log(itemBatches[i])
-			await printStatus(thread, itemBatches[i])
-		}
+		var items = processItems(itemBatches)
+		console.log(items)
+		await printStatus(thread, items)
 	}
 )
 
@@ -69,13 +67,34 @@ async function createThread(message)
 			name: 'FUMO NEWS ' + d,
 			autoArchiveDuration: 60,
 			type: 'GUILD_PUBLIC_THREAD',
-			reason: 'test'
+			reason: 'fumo'
 		}
 	)
 
 	return thread
 }
 
+
+function processItems(itemBatches)
+{
+	var items = []
+
+	for(var i = 0 ; i < itemBatches.length; i += 1)
+	{
+		for(var k = 0 ; k < itemBatches[i].length; k += 1)
+		{
+			var availability = getAvailability(itemBatches[i][k])
+			if (availability.includes("Closed"))
+			{
+				continue
+			}
+
+			items[items.length] = itemBatches[i][k]
+		}
+	}
+
+	return items
+}
 
 async function printStatus(channel, items)
 {
