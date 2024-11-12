@@ -7,7 +7,12 @@ async function search(search)
 	try
 	{
 		search = search.replace(" ", "%20")
-		const browser = await puppeteer.launch({ headless: true });
+		const browser = await puppeteer.launch(
+			{ 
+				headless: true, 
+				executablePath: '/usr/bin/chromium-browser', // Remove if running on Windows.
+			}
+		);
 		const page = await browser.newPage();
 
 		await page.setUserAgent("python-amiami_dev");
