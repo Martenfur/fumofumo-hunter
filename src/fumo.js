@@ -35,16 +35,47 @@ client.on(
 		var channel = client.channels.cache.get(config.channel_id)
 		await channel.send("ᗜ‿ᗜ")
 
+		var itemBatches = []
 		for (var i = 0; i < config.searches.length; i += 1)
 		{
-			var items = await amiami.search(config.searches[i])
-			console.log(items)
-			await printStatus(channel, items)
+			itemBatches[i] = await amiami.search(config.searches[i])
+		}
+
+		var threadMessage = await channel.send(`## ᗜ‿ᗜ`)
+		var thread = await createThread(threadMessage)
+
+		for (var i = 0; i < itemBatches.length; i += 1)
+		{
+			console.log(itemBatches[i])
+			await printStatus(thread, itemBatches[i])
 		}
 	}
 )
 
 client.login(config.discord_token)
+
+async function createThread(message)
+{
+	const date = new Date()
+	
+	const day = String(date.getDate()).padStart(2, '0')
+	const month = String(date.getMonth() + 1).padStart(2, '0')
+	const year = date.getFullYear()
+	
+	var d =  `${day}-${month}-${year}`
+
+	var thread = await message.startThread(
+		{
+			name: 'FUMO NEWS ' + d,
+			autoArchiveDuration: 60,
+			type: 'GUILD_PUBLIC_THREAD',
+			reason: 'test'
+		}
+	)
+
+	return thread
+}
+
 
 async function printStatus(channel, items)
 {
