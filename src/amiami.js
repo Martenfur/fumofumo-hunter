@@ -42,9 +42,11 @@ async function search(search)
 
 		return jsonData.items
 	}
-	catch
+	catch(e)
 	{
 		console.log("ERROR trying to get data from Amiami! probably blocked. :(")
+		console.log(e)
+
 		return null
 	}
 }
