@@ -4,6 +4,10 @@
 
 This Discord bot tracks fumo sales on [amiami.com](https://amiami.com) and pings when new fumos appear.
 
+By default, the bot tracks fumo sales and posts status in a designated channel once a day.
+
+![img](img/example.png "example")
+
 ## Setup
 
 ### Installation
