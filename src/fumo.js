@@ -19,6 +19,8 @@ const client = new Discord.Client(
 	}
 )
 
+var channel = null
+
 client.on(
 	"ready", 
 	async () => {
@@ -33,26 +35,46 @@ client.on(
 			console.log(guilds[i].name + ": " + guilds[i].id)
 		}
 
-		var channel = client.channels.cache.get(config.channel_id)
+		channel = client.channels.cache.get(config.channel_id)
 		await channel.send("ᗜ‿ᗜ")
 
-		var itemBatches = []
-		for (var i = 0; i < config.searches.length; i += 1)
+		run()
+	}
+)
+
+async function run()
+{
+	var itemBatches = []
+	for (var i = 0; i < config.searches.length; i += 1)
+	{
+		var result = await amiami.search(config.searches[i])
+		if (result != null)
 		{
-			itemBatches[i] = await amiami.search(config.searches[i])
+			itemBatches[itemBatches.length] = result
 		}
+		else
+		{
+			console.log("Something went wrong retrieving data from Amiami!")
+			setTimeout(run, config.check_delay_minutes * 60 * 1000)
+			return
+		}
+	}
 
-		var items = processItems(itemBatches)
-		console.log(items)
+	var items = processItems(itemBatches)
+	console.log(items)
 
-		var stateReport = state.compare(getDate(), items)
+	var stateReport = state.compare(getDate(), items)
+	if (stateReport.dayChanged || stateReport.newItems.length > 0)
+	{
 		var threadMessage = await channel.send(getReportMessage(items, stateReport))
 		var thread = await createThread(threadMessage)
 
 		await printStatus(thread, items, stateReport)
 		state.save(getDate(), items)
 	}
-)
+
+	setTimeout(run, config.check_delay_minutes * 60 * 1000)
+}
 
 function getReportMessage(items, stateReport)
 {
@@ -67,10 +89,11 @@ function getReportMessage(items, stateReport)
 	{
 		return noNewFumosMessage
 	}
-	var newFumosMessage = `# BREAKING FUMO NEWS: ${stateReport.newItems.length} new fumos are available. ᗜ‿ᗜ`
+	// Not the best idea to jsut go with @everyone but who cares tbh.
+	var newFumosMessage = `@everyone\n# BREAKING FUMO NEWS: ${stateReport.newItems.length} new fumos are available. ᗜ‿ᗜ`
 	if (stateReport.newItems.length == 1)
 	{
-		newFumosMessage = `# BREAKING FUMO NEWS: 1 new fumo is available. ᗜ‿ᗜ`
+		newFumosMessage = `@everyone\n# BREAKING FUMO NEWS: 1 new fumo is available. ᗜ‿ᗜ`
 	}
 
 	newFumosMessage += "\n```"
@@ -219,3 +242,5 @@ function getAvailability(item)
 	}
 	return "Buy Now"
 }
+
+

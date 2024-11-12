@@ -9,6 +9,7 @@
 		"Gift",
 		"Amiami"
 	],
+	"check_delay_minutes": 30,
 	"channel_id": "<your-discord-channel-id>",
 	"discord_token": "<your-token>"
 }
