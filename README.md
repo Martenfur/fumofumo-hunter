@@ -14,14 +14,30 @@ You can host fumo stalker yourself. In order to do that, modify `config.json` wi
 {
 	"searches": 
 	[
-		"touhou mini plush",
-		"fumofumo plush"
+		"touhou fumofumo plush",
+		"touhou mini plush"
 	],
+	"makers_whitelist": 
+	[
+		"Gift",
+		"Amiami"
+	],
+	"check_delay_minutes": 30,
 	"channel_id": "<channel-id-where-bot-will-post>",
 	"discord_token": "<your-discord-bot-token>"
 }
 
 ```
+
+`searches` - determines what the bot searches for on Amiami.
+
+`makers_whitelist` - filters out everything not made by listed makers. Leave empty to allow all makers.
+
+`check_delay_munites` - how often the bot checks new stock in minutes. Note that this doesn't mean the bot will post more frequently - posts will only appear once a day or when new stock appears.
+
+`channel_id` - id of the channel where the bot will be posting.
+
+`discord_token` - your bot's discord token.
 
 On first run, use:
 
