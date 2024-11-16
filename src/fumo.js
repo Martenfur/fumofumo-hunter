@@ -66,7 +66,29 @@ async function run()
 	var stateReport = state.compare(getDate(), items)
 	if (stateReport.dayChanged || stateReport.newItems.length > 0)
 	{
-		var threadMessage = await channel.send(getReportMessage(items, stateReport))
+		var reportMessage = getReportMessage(items, stateReport)
+		var messageContent = {
+			content: reportMessage.message,
+			files: []
+		}
+		for(var i = 0; i < reportMessage.images.length; i += 1)
+		{
+			messageContent.files[messageContent.files.length] = new Discord.AttachmentBuilder(`https://img.amiami.com${reportMessage.images[i]}`, 'image.jpg')
+			if (messageContent.files.length >= 10)
+			{
+				break
+			}
+		}
+		var threadMessage = null
+		try
+		{
+			threadMessage = await channel.send(messageContent)
+		}
+		catch(e)
+		{
+			console.log(e)
+			threadMessage = await channel.send(messageContent.content)
+		}
 		var thread = await createThread(threadMessage)
 
 		await printStatus(thread, items, stateReport)
@@ -83,13 +105,14 @@ function getReportMessage(items, stateReport)
 
 	if (items.length == 0)
 	{
-		return noFumosMessage
+		return { message: noFumosMessage, images: [] }
 	}
 	if (stateReport.firstRun || stateReport.newItems.length == 0)
 	{
-		return noNewFumosMessage
+		return { message: noNewFumosMessage, images: [] }
 	}
 	// Not the best idea to jsut go with @everyone but who cares tbh.
+	var images = []
 	var newFumosMessage = `@everyone\n# BREAKING FUMO NEWS: ${stateReport.newItems.length} new fumos are available. ᗜ‿ᗜ`
 	if (stateReport.newItems.length == 1)
 	{
@@ -100,10 +123,11 @@ function getReportMessage(items, stateReport)
 	for(var i = 0; i < stateReport.newItems.length; i += 1)
 	{
 		newFumosMessage += `\n${stateReport.newItems[i].gname}`
+		images[i] = stateReport.newItems[i].thumb_url
 	}
 	newFumosMessage += "\n```"
 
-	return newFumosMessage
+	return { message: newFumosMessage, images: images }
 }
 
 client.login(config.discord_token)
