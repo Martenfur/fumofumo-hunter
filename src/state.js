@@ -22,7 +22,7 @@ function save(dateString, items)
 
 	for(var i = 0; i < items.length; i += 1)
 	{
-		state.items[i] = items[i].gcode
+		state.items[i] = items[i]
 	}
 
 	fs.writeFileSync(stateFileName, JSON.stringify(state, null, 4))
@@ -47,7 +47,16 @@ function compare(dateString, items)
 
 	for(var i = 0; i < items.length; i += 1)
 	{
-		if (state.items.indexOf(items[i].gcode) <= -1)
+		var hasItem = false
+		for(var k = 0; k < state.items.length; k += 1)
+		{
+			if (state.items[k].gcode == items[i].gcode)
+			{
+				hasItem = true
+			}
+		}
+
+		if (!hasItem)
 		{
 			report.newItems[report.newItems.length] = items[i]
 		}
