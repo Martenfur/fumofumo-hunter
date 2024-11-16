@@ -208,8 +208,6 @@ function processItems(itemBatches)
 			items[items.length] = itemBatches[i][k]
 		}
 	}
-	items.pop()
-	items.pop()
 
 	return items
 }
