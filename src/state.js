@@ -36,13 +36,15 @@ function compare(dateString, items)
 		return {
 			firstRun: true,
 			newItems: [],
+			removedItems: [],
 			dayChanged: true
 		}
 	}
 	var report = {
 		dayChanged: (state.date != dateString),
 		firstRun: false,
-		newItems: []
+		newItems: [],
+		removedItems: []
 	}
 
 	for(var i = 0; i < items.length; i += 1)
@@ -59,6 +61,23 @@ function compare(dateString, items)
 		if (!hasItem)
 		{
 			report.newItems[report.newItems.length] = items[i]
+		}
+	}
+
+	for(var k = 0; k < state.items.length; k += 1)
+	{
+		var hasItem = false
+		for(var i = 0; i < items.length; i += 1)
+		{
+			if (state.items[k].gcode == items[i].gcode)
+			{
+				hasItem = true
+			}
+		}
+
+		if (!hasItem)
+		{
+			report.removedItems[report.removedItems.length] = state.items[k]
 		}
 	}
 
